@@ -1,17 +1,16 @@
-package ru.prpaha.yandex.kassa.domain;
+package ru.prpaha.yandex.kassa.request;
 
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import ru.prpaha.yandex.kassa.domain.Currency;
 
 import java.io.Serializable;
-import java.util.Map;
 
 @Getter
-@EqualsAndHashCode
+@AllArgsConstructor
 public class Amount implements Serializable {
 
     private String value;
     private Currency currency;
-    private Map<String, Object> additionalProperties;
 
 }
