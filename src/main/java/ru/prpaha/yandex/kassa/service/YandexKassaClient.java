@@ -19,6 +19,7 @@ import ru.prpaha.yandex.kassa.request.IConfirmation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -50,20 +51,32 @@ public class YandexKassaClient {
         client = clientBuilder.build();
     }
 
-    public Payment createPayment(BigDecimal amount, Currency currency, boolean capture, String description,
-                                 IConfirmation confirmation, String paymentToken, String idempotenceKey) throws YandexKassaException {
-        if (StringUtils.isNotBlank(description) && description.length() > 128) {
-            throw new RuntimeException("description must be not biggest 128 characters");
-        }
+    public Payment createPayment(BigDecimal amount, Currency currency, String paymentToken)
+            throws YandexKassaException {
+        return createPayment(amount, currency, null, null, null, paymentToken,
+                null, null);
+    }
+
+    public Payment createPayment(BigDecimal amount, Currency currency, Boolean capture, String description,
+                                 IConfirmation confirmation, String paymentToken, String idempotenceKey,
+                                 Map<String, Object> metaData)
+            throws YandexKassaException {
         if (amount == null || amount.compareTo(new BigDecimal(0)) <= 0) {
             throw new RuntimeException("invalid amount");
         }
         if (currency == null) {
             throw new RuntimeException("invalid currency");
         }
+        if (StringUtils.isNotBlank(description) && description.length() > 128) {
+            throw new RuntimeException("description length must be max 128 characters");
+        }
+        if (metaData != null && metaData.size() > 16) {
+            throw  new RuntimeException("invalid metadata, length must be max 16");
+        }
 
         Amount amountObj = new Amount(amount.setScale(2, BigDecimal.ROUND_HALF_UP).toString(), currency);
-        CreatePaymentRequest paymentRequest = new CreatePaymentRequest(amountObj, capture, confirmation, description, paymentToken);
+        CreatePaymentRequest paymentRequest = new CreatePaymentRequest(amountObj, capture, confirmation, description,
+                paymentToken, metaData);
 
         Gson gson = new Gson();
         String json = gson.toJson(paymentRequest);

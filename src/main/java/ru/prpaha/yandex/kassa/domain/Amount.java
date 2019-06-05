@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Map;
 
 @Getter
 @EqualsAndHashCode
@@ -12,6 +11,5 @@ public class Amount implements Serializable {
 
     private String value;
     private Currency currency;
-    private Map<String, Object> additionalProperties;
 
 }

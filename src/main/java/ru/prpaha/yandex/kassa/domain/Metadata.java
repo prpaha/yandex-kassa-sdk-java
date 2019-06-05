@@ -4,12 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.HashMap;
 
 @Getter
 @EqualsAndHashCode
-public class Metadata implements Serializable {
-
-    private Map<String, Object> additionalProperties;
+public class Metadata extends HashMap<String, Object> implements Serializable {
 
 }

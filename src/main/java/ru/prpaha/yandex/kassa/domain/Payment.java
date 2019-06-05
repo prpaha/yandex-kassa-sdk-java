@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Map;
 
 @Getter
 @EqualsAndHashCode
@@ -22,6 +21,5 @@ public class Payment implements Serializable {
     private Metadata metadata;
     private Recipient recipient;
     private Boolean test;
-    private Map<String, Object> additionalProperties;
 
 }

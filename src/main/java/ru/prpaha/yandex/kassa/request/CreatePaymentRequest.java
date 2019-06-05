@@ -5,17 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.Map;
 
 @Getter
 @AllArgsConstructor
 public class CreatePaymentRequest implements Serializable {
 
     private Amount amount;
-    private boolean capture;
+    private Boolean capture;
     private IConfirmation confirmation;
     private String description;
     @SerializedName("payment_token")
     private String paymentToken;
+    private Map<String, Object> metadata;
 
 }
