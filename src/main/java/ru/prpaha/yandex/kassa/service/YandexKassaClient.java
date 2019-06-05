@@ -26,22 +26,28 @@ public class YandexKassaClient {
 
     private Logger log = Logger.getLogger(YandexKassaClient.class.getName());
 
+    private static final String USER_AGENT_YANDEX_KASSA_SDK = "yandex-kassa-sdk";
     private static final MediaType JSON = MediaType.get("application/json");
 
     private OkHttpClient client;
 
-    private YandexKassaClient(final String shopId, final String secretKey) {
-//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        client = new OkHttpClient.Builder()
-//                .addNetworkInterceptor(logging)
+    private YandexKassaClient(final String shopId, final String secretKey, boolean logEnabled) {
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .authenticator((route, response) -> {
                     String credentials = Credentials.basic(shopId, secretKey);
                     return response.request().newBuilder()
                             .header("Authorization", credentials)
+                            .header("User-Agent", USER_AGENT_YANDEX_KASSA_SDK)
                             .build();
-                })
-                .build();
+                });
+
+        if (logEnabled) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            clientBuilder.addNetworkInterceptor(logging);
+        }
+
+        client = clientBuilder.build();
     }
 
     public Payment createPayment(BigDecimal amount, Currency currency, boolean capture, String description,
@@ -95,6 +101,7 @@ public class YandexKassaClient {
 
         private String shopId;
         private String secretKey;
+        private boolean logEnabled = false;
 
         public Builder shopId(final String shopId) {
             this.shopId = shopId;
@@ -106,6 +113,11 @@ public class YandexKassaClient {
             return this;
         }
 
+        public Builder logEnabled(boolean logEnabled) {
+            this.logEnabled = logEnabled;
+            return this;
+        }
+
         public YandexKassaClient build() {
             if (StringUtils.isBlank(shopId)) {
                 throw new RuntimeException("invalid shopId");
@@ -114,7 +126,7 @@ public class YandexKassaClient {
                 throw new RuntimeException("invalid secretKey");
             }
 
-            return new YandexKassaClient(shopId, secretKey);
+            return new YandexKassaClient(shopId, secretKey, logEnabled);
         }
 
     }

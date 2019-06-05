@@ -94,7 +94,7 @@ class IntegrationTest {
     }
 
     @Test
-    void makeRequest() {
+    void makeRequestSuccess() {
         YandexKassaClient kassaClient = new YandexKassaClient.Builder()
                 .secretKey(YANDEX_API_SECRET_KEY)
                 .shopId(YANDEX_SHOP_ID)
