@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class Payment implements Serializable {
 
     private String id;
-    private String status;
+    private PaymentStatus status;
     private Boolean paid;
     private Amount amount;
     private Confirmation confirmation;

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Metadata extends HashMap<String, Object> implements Serializable {
 
 }
