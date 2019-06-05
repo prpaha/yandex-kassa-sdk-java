@@ -13,8 +13,9 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 !YandexKassaSDK-0.0.1.jar
+!YandexKassaSDK-0.0.2.jar
+*.jar
 *.war
 *.nar
 *.ear
