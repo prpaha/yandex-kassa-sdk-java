@@ -2,14 +2,29 @@ plugins {
     id 'java'
 }
 
+apply plugin: 'java'
+apply plugin: 'maven'
+
 repositories {
     mavenCentral()
+}
+
+version = '0.0.1'
+
+uploadArchives {
+    project.version = "0.0.1"
+    project.group = "ru.prpaha"
+    repositories {
+        mavenDeployer {
+            repository(url: "file://./${projectDir}/repository/")
+        }
+    }
 }
 
 dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.0.0-RC1'
     implementation 'com.google.code.gson:gson:2.8.5'
-    
+
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
