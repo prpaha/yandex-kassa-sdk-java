@@ -10,6 +10,7 @@ import ru.prpaha.yandex.kassa.request.ConfirmationType;
 import ru.prpaha.yandex.kassa.request.IConfirmation;
 import ru.prpaha.yandex.kassa.service.YandexKassaClient;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
 
         try {
@@ -60,6 +63,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
 
         try {
@@ -69,6 +74,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
 
         try {
@@ -78,6 +85,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
 
         StringBuilder descriptionBuilder = new StringBuilder();
@@ -93,6 +102,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
 
         Map<String, Object> metadata = new HashMap<>(17);
@@ -107,6 +118,8 @@ class IntegrationTest {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
+        } catch (UnsupportedEncodingException e) {
+            Assertions.fail();
         }
     }
 
@@ -151,6 +164,8 @@ class IntegrationTest {
             payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
         } catch (YandexKassaException e) {
             e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
         Assertions.assertNotNull(payment);
@@ -176,6 +191,8 @@ class IntegrationTest {
         try {
             payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
         } catch (YandexKassaException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -209,6 +226,8 @@ class IntegrationTest {
         try {
             payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
         } catch (YandexKassaException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 

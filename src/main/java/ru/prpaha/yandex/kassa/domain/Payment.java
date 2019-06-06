@@ -4,12 +4,14 @@ import com.google.gson.annotations.SerializedName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
+@ToString
 public class Payment implements Serializable {
 
     private String id;
