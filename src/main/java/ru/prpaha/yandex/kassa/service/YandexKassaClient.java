@@ -57,6 +57,32 @@ public class YandexKassaClient {
                 null, null);
     }
 
+    public Payment getPayment(String paymentId) throws YandexKassaException {
+        if (StringUtils.isBlank(paymentId)) {
+            throw new RuntimeException("invalid paymentId");
+        }
+
+        Request request = new Request.Builder()
+                .url(String.format(Constants.GET_PAYMENT_URL, paymentId))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String getPaymentResult = response.body().string();
+            log.info("Request from Yandex.Kassa: " + getPaymentResult);
+            Gson gson = new Gson();
+            if (response.isSuccessful()) {
+                return gson.fromJson(getPaymentResult, Payment.class);
+            } else {
+                Error error = gson.fromJson(getPaymentResult, Error.class);
+                throw new YandexKassaException(error);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public Payment createPayment(BigDecimal amount, Currency currency, Boolean capture, String description,
                                  IConfirmation confirmation, String paymentToken, String idempotenceKey,
                                  Map<String, Object> metaData)

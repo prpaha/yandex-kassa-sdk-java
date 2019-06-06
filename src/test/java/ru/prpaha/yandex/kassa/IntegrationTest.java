@@ -20,7 +20,7 @@ class IntegrationTest {
     private static final String YANDEX_SHOP_ID = "610039";
 
     @Test
-    void createKassaClientFail() {
+    void createKassaClientFailTest() {
         try {
             new YandexKassaClient.Builder().build();
             Assertions.fail();
@@ -30,10 +30,11 @@ class IntegrationTest {
     }
 
     @Test
-    void makeRequestFail() {
+    void makeRequestFailTest() {
         YandexKassaClient kassaClient = new YandexKassaClient.Builder()
                 .secretKey(YANDEX_API_SECRET_KEY)
                 .shopId(YANDEX_SHOP_ID)
+                .logEnabled(true)
                 .build();
 
         BigDecimal amount = new BigDecimal("100");
@@ -110,10 +111,11 @@ class IntegrationTest {
     }
 
 //    @Test
-    void makeSimpleRequestSuccess() {
+    void makeSimpleRequestSuccessTest() {
         YandexKassaClient kassaClient = new YandexKassaClient.Builder()
                 .secretKey(YANDEX_API_SECRET_KEY)
                 .shopId(YANDEX_SHOP_ID)
+                .logEnabled(true)
                 .build();
 
         BigDecimal amount = new BigDecimal("100");
@@ -132,10 +134,11 @@ class IntegrationTest {
     }
 
     @Test
-    void makeFullRequestSuccess() {
+    void makeFullRequestSuccessTest() {
         YandexKassaClient kassaClient = new YandexKassaClient.Builder()
                 .secretKey(YANDEX_API_SECRET_KEY)
                 .shopId(YANDEX_SHOP_ID)
+                .logEnabled(true)
                 .build();
 
         BigDecimal amount = new BigDecimal("100");
@@ -154,6 +157,69 @@ class IntegrationTest {
         Assertions.assertEquals(payment.getAmount().getCurrency(), currency);
         Assertions.assertTrue(new BigDecimal(payment.getAmount().getValue()).compareTo(amount) == 0);
         Assertions.assertEquals(payment.getDescription(), description);
+    }
+
+    @Test
+    void getPaymentTest() {
+        YandexKassaClient kassaClient = new YandexKassaClient.Builder()
+                .secretKey(YANDEX_API_SECRET_KEY)
+                .shopId(YANDEX_SHOP_ID)
+                .logEnabled(true)
+                .build();
+
+        BigDecimal amount = new BigDecimal("100");
+        Currency currency = Currency.RUB;
+        boolean capture = true;
+        String description = "Описание платежа";
+        IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "https://www.merchant-website.com/return_url");
+        Payment payment = null;
+        try {
+            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
+        } catch (YandexKassaException e) {
+            e.printStackTrace();
+        }
+
+        Payment checkPayment = null;
+        try {
+            checkPayment = kassaClient.getPayment(payment.getId());
+        } catch (YandexKassaException e) {
+            e.printStackTrace();
+        }
+        Assertions.assertNotNull(checkPayment);
+        Assertions.assertEquals(checkPayment.getId(), payment.getId());
+        Assertions.assertEquals(checkPayment.getAmount().getCurrency(), currency);
+        Assertions.assertTrue(new BigDecimal(checkPayment.getAmount().getValue()).compareTo(amount) == 0);
+        Assertions.assertEquals(checkPayment.getDescription(), description);
+    }
+
+    @Test
+    void getPaymentFailTest() {
+        YandexKassaClient kassaClient = new YandexKassaClient.Builder()
+                .secretKey(YANDEX_API_SECRET_KEY)
+                .shopId(YANDEX_SHOP_ID)
+                .logEnabled(true)
+                .build();
+
+        BigDecimal amount = new BigDecimal("100");
+        Currency currency = Currency.RUB;
+        boolean capture = true;
+        String description = "Описание платежа";
+        IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "https://www.merchant-website.com/return_url");
+        Payment payment = null;
+        try {
+            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
+        } catch (YandexKassaException e) {
+            e.printStackTrace();
+        }
+
+        Payment checkPayment = null;
+        try {
+            checkPayment = kassaClient.getPayment(payment.getId() + "0");
+            Assertions.fail();
+        } catch (YandexKassaException e) {
+            e.printStackTrace();
+            // Success case
+        }
     }
 
 }
