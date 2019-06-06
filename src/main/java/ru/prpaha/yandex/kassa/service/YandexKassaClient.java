@@ -8,7 +8,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.apache.commons.lang3.StringUtils;
 import ru.prpaha.yandex.kassa.domain.Currency;
 import ru.prpaha.yandex.kassa.domain.Error;
 import ru.prpaha.yandex.kassa.domain.Payment;
@@ -16,6 +15,7 @@ import ru.prpaha.yandex.kassa.exception.YandexKassaException;
 import ru.prpaha.yandex.kassa.request.Amount;
 import ru.prpaha.yandex.kassa.request.CreatePaymentRequest;
 import ru.prpaha.yandex.kassa.request.IConfirmation;
+import ru.prpaha.yandex.kassa.utils.StringUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;

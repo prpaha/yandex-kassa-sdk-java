@@ -3,37 +3,59 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
 }
 
-version = '0.0.2'
-
-uploadArchives {
-    project.version = "0.0.2"
-    project.group = "ru.prpaha"
+publishing {
     repositories {
-        mavenDeployer {
-            repository(url: "file://./${projectDir}/repository/")
+        mavenLocal()
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'ru.prpaha'
+
+            artifact 'build/libs/YandexKassaSDK-0.0.2.jar'
         }
     }
 }
 
+version = '0.0.2'
+
+configurations {
+    fatJar
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'rpi-sense-hat-lib',
+                'Implementation-Version': version
+    }
+    baseName = project.name
+    from {
+        configurations.fatJar.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
+
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.0.0-RC1'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.2'
+    fatJar 'com.squareup.okhttp3:okhttp:3.14.2'
     implementation 'com.google.code.gson:gson:2.8.5'
+    fatJar 'com.google.code.gson:gson:2.8.5'
 
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
-    compile 'org.apache.commons:commons-lang3:3.9'
-
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
-    implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.14.2'
+    fatJar 'com.squareup.okhttp3:logging-interceptor:3.14.2'
 }
 
 configurations {
