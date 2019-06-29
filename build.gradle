@@ -17,12 +17,12 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'ru.prpaha'
 
-            artifact 'build/libs/YandexKassaSDK-0.0.2.jar'
+            artifact 'build/libs/YandexKassaSDK-0.0.3.jar'
         }
     }
 }
 
-version = '0.0.2'
+version = '0.0.3'
 
 configurations {
     fatJar

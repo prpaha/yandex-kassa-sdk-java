@@ -14,10 +14,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import ru.prpaha.yandex.kassa.domain.Currency;
 import ru.prpaha.yandex.kassa.domain.Error;
 import ru.prpaha.yandex.kassa.domain.Payment;
+import ru.prpaha.yandex.kassa.domain.Receipt;
 import ru.prpaha.yandex.kassa.exception.YandexKassaException;
 import ru.prpaha.yandex.kassa.request.Amount;
 import ru.prpaha.yandex.kassa.request.CreatePaymentRequest;
@@ -48,19 +48,28 @@ public class YandexKassaClient {
         client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
     }
 
+    /**
+     * Создание платежа в сервисе Yandex.Kassa. Упрощёный сценарий с минимальными параметрами.
+     *
+     * @param amount       сумма платежа (required)
+     * @param currency     валюта платежа (required)
+     * @param paymentToken токен для платежа полученый из библиотеки Yandex.Kassa SDK для мобильных или WEB платформ
+     * @return сохранённый платёж
+     * @throws YandexKassaException
+     */
     public Payment createPayment(BigDecimal amount, Currency currency, String paymentToken)
             throws YandexKassaException {
-        try {
-            return createPayment(amount, currency, null, null, null, paymentToken,
-                    null, null);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Error error = new Error();
-            error.setDescription("Ошибка отправки запроса");
-            throw new YandexKassaException(error);
-        }
+        return createPayment(amount, currency, null, null, null, paymentToken,
+                null, null, null);
     }
 
+    /**
+     * Получение платежа из реестра Yandex.Kassa
+     *
+     * @param paymentId идентификатор платежа присвоенного сесвисом Yandex.Kassa
+     * @return платёж
+     * @throws YandexKassaException
+     */
     public Payment getPayment(String paymentId) throws YandexKassaException {
         if (StringUtils.isBlank(paymentId)) {
             throw new RuntimeException("invalid paymentId");
@@ -85,10 +94,25 @@ public class YandexKassaClient {
         return null;
     }
 
+    /**
+     * Создание платежа в сервисе Yandex.Kassa
+     *
+     * @param amount         сумма платежа (required)
+     * @param currency       валюта платежа (required)
+     * @param capture        вид платежа (true - простой сценарий, false - с холдированием и спианием по требованию)
+     * @param description    информация о платеже
+     * @param confirmation   необходимый сценарий подтверждения платежа
+     * @param paymentToken   токен для платежа полученый из библиотеки Yandex.Kassa SDK для мобильных или WEB платформ
+     * @param idempotenceKey сгенерированный вами уникальный ключ заказа
+     * @param receipt        данные для формирования чека в онлайн-кассе. Необходимо указать что-то одно — телефон пользователя (phone) или его электронную почту (email)
+     * @param metaData       дополнительные данные о платеже
+     * @return сохранённый платёж
+     * @throws YandexKassaException
+     * @throws UnsupportedEncodingException
+     */
     public Payment createPayment(BigDecimal amount, Currency currency, Boolean capture, String description,
                                  IConfirmation confirmation, String paymentToken, String idempotenceKey,
-                                 Map<String, Object> metaData)
-            throws YandexKassaException, UnsupportedEncodingException {
+                                 Receipt receipt, Map<String, Object> metaData) throws YandexKassaException {
         if (amount == null || amount.compareTo(new BigDecimal(0)) <= 0) {
             throw new RuntimeException("invalid amount");
         }
@@ -99,12 +123,12 @@ public class YandexKassaClient {
             throw new RuntimeException("description length must be max 128 characters");
         }
         if (metaData != null && metaData.size() > 16) {
-            throw  new RuntimeException("invalid metadata, length must be max 16");
+            throw new RuntimeException("invalid metadata, length must be max 16");
         }
 
         Amount amountObj = new Amount(amount.setScale(2, BigDecimal.ROUND_HALF_UP).toString(), currency);
         CreatePaymentRequest paymentRequest = new CreatePaymentRequest(amountObj, capture, confirmation, description,
-                paymentToken, metaData);
+                paymentToken, receipt, metaData);
 
         Gson gson = new Gson();
         String json = gson.toJson(paymentRequest);

@@ -2,17 +2,22 @@ package ru.prpaha.yandex.kassa;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.prpaha.yandex.kassa.domain.Amount;
 import ru.prpaha.yandex.kassa.domain.Currency;
 import ru.prpaha.yandex.kassa.domain.Payment;
+import ru.prpaha.yandex.kassa.domain.Receipt;
+import ru.prpaha.yandex.kassa.domain.ReceiptCustomer;
+import ru.prpaha.yandex.kassa.domain.ReceiptItem;
 import ru.prpaha.yandex.kassa.exception.YandexKassaException;
 import ru.prpaha.yandex.kassa.request.ConfirmationRedirect;
 import ru.prpaha.yandex.kassa.request.ConfirmationType;
 import ru.prpaha.yandex.kassa.request.IConfirmation;
 import ru.prpaha.yandex.kassa.service.YandexKassaClient;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class IntegrationTest {
@@ -43,50 +48,53 @@ class IntegrationTest {
         boolean capture = true;
         String description = "Описание платежа";
         IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "http://test.ts");
+
+        ReceiptCustomer receiptCustomer = new ReceiptCustomer("79500075471", null, null, null);
+        List<ReceiptItem> items = Arrays.asList(new ReceiptItem("description", "2.00",
+                new Amount("10.00", Currency.RUB), "2", null, null,
+                null, null, null));
+        Receipt receipt = new Receipt(receiptCustomer, items);
+
         String paymentToken = "paymentToken";
 
         try {
-            kassaClient.createPayment(null, currency, capture, description, confirmation, paymentToken, null, null);
+            kassaClient.createPayment(null, currency, capture, description, confirmation, paymentToken,
+                    null, receipt, null);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
 
         try {
-            kassaClient.createPayment(new BigDecimal(0), currency, capture, description, confirmation, paymentToken, null, null);
+            kassaClient.createPayment(new BigDecimal(0), currency, capture, description, confirmation, paymentToken,
+                    null, receipt, null);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
 
         try {
-            kassaClient.createPayment(new BigDecimal(-1), currency, capture, description, confirmation, paymentToken, null, null);
+            kassaClient.createPayment(new BigDecimal(-1), currency, capture, description, confirmation, paymentToken,
+                    null, receipt, null);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
 
         try {
-            kassaClient.createPayment(amount, null, capture, description, confirmation, paymentToken, null, null);
+            kassaClient.createPayment(amount, null, capture, description, confirmation, paymentToken,
+                    null, receipt, null);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
 
         StringBuilder descriptionBuilder = new StringBuilder();
@@ -96,14 +104,13 @@ class IntegrationTest {
 
         description = descriptionBuilder.toString();
         try {
-            kassaClient.createPayment(amount, currency, capture, description, confirmation, paymentToken, null, null);
+            kassaClient.createPayment(amount, currency, capture, description, confirmation, paymentToken,
+                    null, receipt, null);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
 
         Map<String, Object> metadata = new HashMap<>(17);
@@ -112,39 +119,38 @@ class IntegrationTest {
         }
 
         try {
-            kassaClient.createPayment(amount, currency, capture, description, confirmation, paymentToken, null, metadata);
+            kassaClient.createPayment(amount, currency, capture, description, confirmation, paymentToken,
+                    null, receipt, metadata);
             Assertions.fail();
         } catch (YandexKassaException e) {
             Assertions.fail();
         } catch (RuntimeException e) {
             // Success case
-        } catch (UnsupportedEncodingException e) {
-            Assertions.fail();
         }
     }
 
 //    @Test
-    void makeSimpleRequestSuccessTest() {
-        YandexKassaClient kassaClient = new YandexKassaClient.Builder()
-                .secretKey(YANDEX_API_SECRET_KEY)
-                .shopId(YANDEX_SHOP_ID)
-                .logEnabled(true)
-                .build();
-
-        BigDecimal amount = new BigDecimal("100");
-        Currency currency = Currency.RUB;
-        String paymentToken = "test_payment_token";
-        Payment payment = null;
-        try {
-            payment = kassaClient.createPayment(amount, currency, paymentToken);
-        } catch (YandexKassaException e) {
-            e.printStackTrace();
-        }
-
-        Assertions.assertNotNull(payment);
-        Assertions.assertEquals(payment.getAmount().getCurrency(), currency);
-        Assertions.assertTrue(new BigDecimal(payment.getAmount().getValue()).compareTo(amount) == 0);
-    }
+//    void makeSimpleRequestSuccessTest() {
+//        YandexKassaClient kassaClient = new YandexKassaClient.Builder()
+//                .secretKey(YANDEX_API_SECRET_KEY)
+//                .shopId(YANDEX_SHOP_ID)
+//                .logEnabled(true)
+//                .build();
+//
+//        BigDecimal amount = new BigDecimal("100");
+//        Currency currency = Currency.RUB;
+//        String paymentToken = "test_payment_token";
+//        Payment payment = null;
+//        try {
+//            payment = kassaClient.createPayment(amount, currency, paymentToken);
+//        } catch (YandexKassaException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Assertions.assertNotNull(payment);
+//        Assertions.assertEquals(payment.getAmount().getCurrency(), currency);
+//        Assertions.assertTrue(new BigDecimal(payment.getAmount().getValue()).compareTo(amount) == 0);
+//    }
 
     @Test
     void makeFullRequestSuccessTest() {
@@ -159,12 +165,18 @@ class IntegrationTest {
         boolean capture = true;
         String description = "Описание платежа";
         IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "https://www.merchant-website.com/return_url");
+
+        ReceiptCustomer receiptCustomer = new ReceiptCustomer("79500075471", null, null, null);
+        List<ReceiptItem> items = Arrays.asList(new ReceiptItem("description", "2.00",
+                new Amount("10.00", Currency.RUB), "2", null, null,
+                null, null, null));
+        Receipt receipt = new Receipt(receiptCustomer, items);
+
         Payment payment = null;
         try {
-            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
+            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null,
+                    null, receipt, null);
         } catch (YandexKassaException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -187,12 +199,18 @@ class IntegrationTest {
         boolean capture = true;
         String description = "Описание платежа";
         IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "https://www.merchant-website.com/return_url");
+
+        ReceiptCustomer receiptCustomer = new ReceiptCustomer("79500075471", null, null, null);
+        List<ReceiptItem> items = Arrays.asList(new ReceiptItem("description", "2.00",
+                new Amount("10.00", Currency.RUB), "2", null, null,
+                null, null, null));
+        Receipt receipt = new Receipt(receiptCustomer, items);
+
         Payment payment = null;
         try {
-            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
+            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null,
+                    null, receipt, null);
         } catch (YandexKassaException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -222,18 +240,23 @@ class IntegrationTest {
         boolean capture = true;
         String description = "Описание платежа";
         IConfirmation confirmation = new ConfirmationRedirect(ConfirmationType.redirect, "https://www.merchant-website.com/return_url");
+
+        ReceiptCustomer receiptCustomer = new ReceiptCustomer("79500075471", null, null, null);
+        List<ReceiptItem> items = Arrays.asList(new ReceiptItem("description", "2.00",
+                new Amount("10.00", Currency.RUB), "2", null, null,
+                null, null, null));
+        Receipt receipt = new Receipt(receiptCustomer, items);
+
         Payment payment = null;
         try {
-            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null, null, null);
+            payment = kassaClient.createPayment(amount, currency, capture, description, confirmation, null,
+                    null, receipt, null);
         } catch (YandexKassaException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-        Payment checkPayment = null;
         try {
-            checkPayment = kassaClient.getPayment(payment.getId() + "0");
+            kassaClient.getPayment(payment.getId() + "0");
             Assertions.fail();
         } catch (YandexKassaException e) {
             e.printStackTrace();
